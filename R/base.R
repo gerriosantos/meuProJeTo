@@ -3,7 +3,7 @@
 `%>%` <- magrittr::`%>%`
 
 
-df <- mtcars %>% dplyr::filter(cyl  > 5)
+df <- mtcars %>% dplyr::filter(cyl  > 10 & disp > 100)
 df
 
 
