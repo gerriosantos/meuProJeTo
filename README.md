@@ -53,9 +53,9 @@ df_casos <- readr::read_rds('data/dados.rds')
     -   `confirmed`
     -   `desths`
     -   `reeleicao`
-    -   `d_reeleicao`
-    -   `confirmed_100k`
-    -   `deaths_100k`
+    -   **`d_reeleicao`**
+    -   **`confirmed_100k`**
+    -   **`deaths_100k`**
 
 -   O método que será utilizado para ver essa associação entre as
     variáveis será uma regressão simples de mínimos quadrados ordinários
@@ -66,3 +66,5 @@ df_casos <- readr::read_rds('data/dados.rds')
 # Análise Descritiva dos Dados
 
 ## Análise Gráfica
+
+## Conclusões
