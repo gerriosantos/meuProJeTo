@@ -12,3 +12,6 @@
 
 dados <- dplyr::left_join(h, casos, by = c('codibge'='city_ibge_code')) %>%
   dplyr::relocate(city:deaths, .before = reeleicao)
+
+
+readr::write_rds(dados, 'data/dados.rds')
