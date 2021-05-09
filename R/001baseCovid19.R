@@ -21,7 +21,7 @@ get_covid <- function(url, sigla_uf, cod_uf, date_espec = '2020-12-31'){
 casos <- get_covid(url = 'https://data.brasil.io/dataset/covid19/caso.csv.gz',
                    sigla_uf = 'CE', cod_uf = 23)
 
-readr::write_rds(casos, 'data/df_casos.rds')
+readr::write_rds(casos, 'data/df_casosCE.rds')
 
 
 

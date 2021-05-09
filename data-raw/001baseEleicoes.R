@@ -93,4 +93,8 @@ df <- merg %>% dplyr::left_join(mun, by = c('sg_ue.x'='codigo_tse')) %>%
 
 # Salvar a base de dados completa em data
 
-readr::write_csv(df, 'data/df_reeleitos_20_detalhada.rds')
+readr::write_rds(df, 'data/df_reeleitos_20_detalhada.rds')
+
+
+
+
