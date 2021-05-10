@@ -15,3 +15,4 @@ dados <- dplyr::left_join(h, casos, by = c('codibge'='city_ibge_code')) %>%
 
 
 readr::write_rds(dados, 'data/dados.rds')
+
