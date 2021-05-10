@@ -10,6 +10,42 @@ dados <- readr::read_rds('data/dados.rds') %>%
     pop19 > 200000 ~ 'Nivel 5'
   )) %>%  dplyr::relocate(reeleicao:d_reeleicao, porte_cidade, .before = pop19)
 
+
+# Mapa ----
+ # Mostrar os municípios eleitos e não reeleitos
+
+
+mun <- geobr::read_municipality(code_muni = 'CE') %>%
+  dplyr::select(code_muni, geom) %>%
+  dplyr::left_join(dados, by = c('code_muni'='codibge'))
+
+mun %>% ggplot2::ggplot(ggplot2::aes(fill = reeleicao))+
+  ggplot2::geom_sf()+
+  ggplot2::labs(title = 'Municípios cearenses.', fill = '')+
+  ggplot2::theme_minimal()+
+  ggplot2::scale_fill_viridis_d(option = "plasma",
+                                labels = c("Não Reeleito", "Reeleito",
+                                           "Não Disponível"))+
+  ggplot2::theme(legend.position = 'bottom',
+                 plot.title = ggplot2::element_text(hjust = 0.5, size = 12),
+        text = ggplot2::element_text(family="Times New Roman", color="black",
+                            size=12, face="bold"),
+        axis.title=ggplot2::element_blank(),
+        axis.text=ggplot2::element_blank(),
+        axis.ticks=ggplot2::element_blank())+
+  ggplot2::guides(ggplot2::guide_legend(title.position = 'none'))
+
+
+
+
+
+
+
+
+
+
+
+
 # Tabelas ----
 
     # Tabela retirando municípios acima de 200 mil habitantes
