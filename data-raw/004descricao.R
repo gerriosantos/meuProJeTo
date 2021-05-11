@@ -102,9 +102,6 @@ mob <- readr::read_rds('data-raw/mob_google_mun.RDS') %>%
 
 
 
-
-
-
 stargazer::stargazer(reg_1, reg_2, type = 'text',
                      title = "Regressões de Mínimos Quadrados Ordninários.",
                      dep.var.caption = 'Variável Dependente',
