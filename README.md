@@ -46,14 +46,14 @@ df_casos <- readr::read_rds('data/df_casosCE.rds')
 -   A segunda base de dados uitlizada será a de candidaturas do
     [Tribunal Superios Eleitoral
     (TSE)](https://www.tse.jus.br/hotsites/pesquisas-eleitorais/candidatos.html),
-    dos anos de 2016 e 2020, as quais possibitam saber os prefeitos que
+    dos anos de 2016 e 2020, que possibilitam saber quais os prefeitos
     conseguiram a reeleição ou não.
 
 ``` r
 df_casos <- readr::read_rds('data/df_naoReeleitoCE.rds')
 ```
 
--   Então vamos criar uma base de dados que junte essas duas bases
+-   Então será criado uma base de dados que concatenem essas duas bases
     anteriores, possibilitando que as variáveis de interesses estejam no
     mesmo `data.frame`.
 
@@ -63,10 +63,11 @@ df_casos <- readr::read_rds('data/dados.rds')
 
 -   Os dados foram recortados somente para o estado do Ceará, com as
     variáveis de casos e mortes da covid19 sendo truncadas na data de
-    `2020-12-31`, que mostra os quantitativos acumulados de todo ano
-    de 2020. Por outro lado, a variável de reeleição é uma *dummy*.
-    Portanto, além destas três variáveis principais citadas acima, a
-    base `dados` possui mais sete variáveis:
+    `2020-12-31`, que mostram os quantitativos acumulados de todo ano
+    de 2020. Por outro lado, a variável de reeleição é uma *dummy* (0 -
+    quando o prefeito é reeleito e 1 - quando o prefeito não é
+    reeleito). Portanto, além destas três variáveis principais citadas
+    acima, a base `dados` possui mais sete variáveis:
 
     -   `c_uf`
     -   `codibge`
@@ -87,7 +88,7 @@ df_casos <- readr::read_rds('data/dados.rds')
 
 # Análise Descritiva dos Dados
 
--   Organizando a base de dados para realizar uma sumarização dos dados.
+-   Organizando a base de dados para realizar uma sumarização dos dados:
 
 ``` r
 `%>%` <- magrittr::`%>%`
@@ -103,8 +104,7 @@ dados <- readr::read_rds('data/dados.rds') %>%
 
 -   Dados com coordenadas geográficas (retiradas do pacote do `geobr` do
     [Ipea](https://github.com/ipeaGIT/geobr)) dos municípios do estado
-    do Ceará, as quais foram juntadas a base de dados com as variávies
-    principais:
+    do Ceará, as quais foram unidas a base `dados`:
 
 ``` r
 mun <- readr::read_rds('data/dados_geom.rds')
@@ -112,11 +112,11 @@ mun <- readr::read_rds('data/dados_geom.rds')
 
 -   Mapa mostrando os municípios que reelegeram seus prefeitos e os que
     não reelegeram.
+
     -   O Ceará tem 184 municípios, contudo, a amostra contempla somente
         os prefeitos de 2016 que conseguiram reeleeição ou não.
-        Portanto, há outros 72 municípios que nos quais, por exemplo, os
-        prefeitos já estavam em segundo mandato ou não buscaram a
-        reeleição.
+        Portanto, há outros 72 municípios que, por exemplo, os prefeitos
+        já estavam em segundo mandato ou não buscaram a reeleição.
 
 ``` r
 
@@ -144,8 +144,8 @@ mun %>% ggplot2::ggplot(ggplot2::aes(fill = reeleicao))+
     segundo sua faixa de população. Ao observar os valores médios das
     variáveis, constata-se um certo padrão no qual os municípios de
     menores e médio porte (até Nível 3) apresentam maiores médias no
-    número de mortes por 100k de hab quando se trata de não reelição dos
-    prefeitos, enquanto os casos confirmados por 100k de hab parece
+    número de mortes por 100k de hab quando se trata de não reeleição
+    dos prefeitos, enquanto os casos confirmados por 100k de hab parece
     seguir o padrão reverso quando observado do Nível 2 ao Nivel 4, onde
     os municípios que reelegeram seus prefeitos possuem maiores médias
     de casos confirmados. Diante disso, os indícios apontam que, talvez,
@@ -196,8 +196,9 @@ reeleitos por porte da cidade.
 
 -   Analisar os histogramas para ter uma direção em relação a hipótese
     de normalidade, que deve ser garantida em estimações de mínimos
-    quadrados ordinários. As variáveis usadas serão usadas como
-    dependentes no modelo posteriormente.
+    quadrados ordinários. As variáveis usadas no histograma serão as
+    variáveis dependentes dos modelos de regressões estimados
+    posteriormente.
 
 -   Fazer uma função simples para gerar os dois plots:
 
@@ -264,9 +265,9 @@ reg_2 <- lm(data =  dados, log(deaths_100k) ~ d_reeleicao)
 -   Para utilizar uma regressão múltipla com duas variáveis explicativas
     será feita uma ligação entre a base incial `dados` e a [base de
     mobilidade da google](https://www.google.com.br/covid19/mobility/).
-    Contudo, devido os dados faltantes, sobretudo para municípios de
-    pequeno porte, o resultado será uma amostra de 65 municípios
-    cearenses.
+    Contudo, devido os dados faltantes, principalmente para os
+    municípios de pequeno porte, o resultado será uma amostra de 65
+    municípios cearenses.
 
     -   Quando comparado a quantidade total de municípios do estado, a
         nova base terá cerca de 35% dos municípios.
@@ -276,8 +277,8 @@ reg_2 <- lm(data =  dados, log(deaths_100k) ~ d_reeleicao)
         eleições de 2020), a nova base fica com uma amostra que
         representa em torno de 58%.
 
--   O indicador de mobilidade modebilidade usado na análise será o de
-    **tendências de mobilidade de locais de trabalho**.
+-   O indicador de mobilidade usado na análise será o de **tendências de
+    mobilidade de locais de trabalho**.
 
 ``` r
 `%>%` <- magrittr::`%>%`
@@ -332,20 +333,21 @@ stargazer::stargazer(reg_1, reg_2, reg_m_1, reg_m_2, type = 'text',
 ```
 
 -   Observando os resultados da tabela, pode-se notar que a variável de
-    interesse não tem relação com a variável dependente. Portanto, de
-    acordo com o esboço apresentado, a não reeleição dos prefeitos dos
-    municípios cearenses não está relacionada com o fato do agravamento
-    ou não da pandemia, que foram mensurados por meio dos indicadores de
-    casos confirmados e mortes por covid19. Mesmo quando inserida uma
-    variável de controle (indice de mobilidade), ainda assim, esse
-    resultado se mantém.
+    interesse (`não reeleitos`) não tem relação com as variáveis
+    dependentes (`casos confirmados`, `mortes`). Portanto, de acordo com
+    o esboço apresentado, a não reeleição dos prefeitos dos municípios
+    cearenses não está relacionada com o fato do agravamento ou não da
+    pandemia, que foram mensurados por meio dos indicadores de casos
+    confirmados e mortes por covid19. Mesmo quando inserida uma variável
+    de controle (`indice de mobilidade`), ainda assim, esse resultado se
+    mantém.
 
 # Conclusões
 
 O esboço buscou responder se os prefeitos cearenses não foram reeleitos
-devido a gestão da crise pandemica da covid19. Para isso, usou-se a
-metodologia de MQO. Contudo, os resultados apontaram que não relação
-entre o prefeito não ser reeleito e o mal desempenho na gerência da
+devido a má gestão da crise pandemica da covid19. Para isso, usou-se a
+metodologia de MQO. Contudo, os resultados apontaram que há relação
+entre o prefeito não ser reeleito com o mal desempenho na gerência da
 pandemia.
 
     - Vale ressaltar que este esboço é bastante superficial e, portanto, tem diversas limitações. 
