@@ -350,5 +350,9 @@ metodologia de MQO. Contudo, os resultados apontaram que há relação
 entre o prefeito não ser reeleito com o mal desempenho na gerência da
 pandemia.
 
-    - Vale ressaltar que este esboço é bastante superficial e, portanto, tem diversas limitações. 
-    - Outro ponto a ser ressaltado é que esse esboço é somente para uma unidade da federação, sendo possível que os resultados pra outras unidades possam ser diferentes.
+-   Vale ressaltar que este esboço é bastante superficial e, portanto,
+    tem diversas limitações.
+
+-   Outro ponto a ser ressaltado é que esse esboço é somente para uma
+    unidade da federação, sendo possível que os resultados pra outras
+    unidades possam ser diferentes.
