@@ -2,7 +2,7 @@ Municípios Cearenses que não reelegeram seus prefeitos tiveram mais
 casos de covid19?
 ================
 **Gerrio Barbosa**
-10/05/2021
+11/05/2021
 
 -   [Pacotes Usados](#pacotes-usados)
 -   [Objetivo do Projeto](#objetivo-do-projeto)
@@ -12,6 +12,7 @@ casos de covid19?
     (MQO)](#análise-do-modelo-de-mínimos-quadrados-ordinários-mqo)
     -   [Regressão Simples](#regressão-simples)
     -   [Regressão Múltipla](#regressão-múltipla)
+    -   [Tabela com as Estimações](#tabela-com-as-estimações)
 -   [Conclusões](#conclusões)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -252,8 +253,10 @@ cowplot::plot_grid(d, d1)
         covid19).
 
 ``` r
-reg <- lm(data =  dados, log(confirmed_100k) ~ d_reeleicao)
-reg <- lm(data =  dados, log(deaths_100k) ~ d_reeleicao)
+library(stats)
+
+reg_1 <- lm(data =  dados, log(confirmed_100k) ~ d_reeleicao)
+reg_2 <- lm(data =  dados, log(deaths_100k) ~ d_reeleicao)
 ```
 
 ## Regressão Múltipla
@@ -277,6 +280,7 @@ reg <- lm(data =  dados, log(deaths_100k) ~ d_reeleicao)
     **tendências de mobilidade de locais de trabalho**.
 
 ``` r
+`%>%` <- magrittr::`%>%`
 mob <- readr::read_rds('data-raw/mob_google_mun.RDS') %>%
   dplyr::filter(sigla_uf == 'CE') %>%
   dplyr::select(cod_municipio7, indice_mob = localTrab) %>%
@@ -285,8 +289,64 @@ mob <- readr::read_rds('data-raw/mob_google_mun.RDS') %>%
 ```
 
 ``` r
-reg <- lm(data =  mob, log(confirmed_100k) ~ d_reeleicao + indice_mob)
-reg <- lm(data =  mob, log(deaths_100k) ~ d_reeleicao + indice_mob)
+library(stats)
+
+reg_m_1 <- lm(data =  mob, log(confirmed_100k) ~ d_reeleicao + indice_mob)
+reg_m_2 <- lm(data =  mob, log(deaths_100k) ~ d_reeleicao + indice_mob)
 ```
 
+## Tabela com as Estimações
+
+-   Na tabela abaixo serão apresentadas todas as estimações simples e
+    múltiplas.
+
+``` r
+stargazer::stargazer(reg_1, reg_2, reg_m_1, reg_m_2, type = 'text',
+                     title = "Regressões de Mínimos Quadrados Ordninários.",
+                     dep.var.caption = 'Variável Dependente',
+                      omit.table.layout = c('n'),
+                     omit.stat=c("LL","ser","f")
+                     )
+#> 
+#> Regressões de Mínimos Quadrados Ordninários.
+#> ======================================================================================
+#>                                         Variável Dependente                           
+#>              -------------------------------------------------------------------------
+#>              log(confirmed_100k) log(deaths_100k) log(confirmed_100k) log(deaths_100k)
+#>                      (1)               (2)                (3)               (4)       
+#> --------------------------------------------------------------------------------------
+#> d_reeleicao        -0.037             0.087             -0.187             0.080      
+#>                    (0.096)           (0.106)            (0.120)           (0.102)     
+#>                                                                                       
+#> indice_mob                                              -0.015            -0.018*     
+#>                                                         (0.012)           (0.010)     
+#>                                                                                       
+#> Constant          8.082***           4.181***          7.997***           4.101***    
+#>                    (0.062)           (0.069)            (0.173)           (0.147)     
+#>                                                                                       
+#> --------------------------------------------------------------------------------------
+#> Observations         112               112                65                 65       
+#> R2                  0.001             0.006              0.068             0.050      
+#> Adjusted R2        -0.008             -0.003             0.038             0.019      
+#> ======================================================================================
+```
+
+-   Observando os resultados da tabela, pode-se notar que a variável de
+    interesse não tem relação com a variável dependente. Portanto, de
+    acordo com o esboço apresentado, a não reeleição dos prefeitos dos
+    municípios cearenses não está relacionada com o fato do agravamento
+    ou não da pandemia, que foram mensurados por meio dos indicadores de
+    casos confirmados e mortes por covid19. Mesmo quando inserida uma
+    variável de controle (indice de mobilidade), ainda assim, esse
+    resultado se mantém.
+
 # Conclusões
+
+O esboço buscou responder se os prefeitos cearenses não foram reeleitos
+devido a gestão da crise pandemica da covid19. Para isso, usou-se a
+metodologia de MQO. Contudo, os resultados apontaram que não relação
+entre o prefeito não ser reeleito e o mal desempenho na gerência da
+pandemia.
+
+    - Vale ressaltar que este esboço é bastante superficial e, portanto, tem diversas limitações. 
+    - Outro ponto a ser ressaltado é que esse esboço é somente para uma unidade da federação, sendo possível que os resultados pra outras unidades possam ser diferentes.

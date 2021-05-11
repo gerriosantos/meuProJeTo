@@ -83,9 +83,11 @@ cowplot::plot_grid(d, d1)
 
 ## Regressão simples
 
-reg <- lm(data = dados, log(deaths_100k) ~ d_reeleicao)
+reg_1 <- lm(data = dados, log(confirmed_100k) ~ d_reeleicao)
 
-stargazer(reg, type = 'text')
+reg_2 <- lm(data = dados, log(deaths_100k) ~ d_reeleicao)
+
+stargazer::stargazer(reg, type = 'text')
 
 
 
@@ -96,7 +98,19 @@ mob <- readr::read_rds('data-raw/mob_google_mun.RDS') %>%
   dplyr::filter(sigla_uf == 'CE') %>%
   dplyr::select(cod_municipio7, indice_mob = localTrab) %>%
   dplyr::left_join(dados, by = c('cod_municipio7'='codibge')) %>%
-  tidyr::drop_na(indice_mob)
+  tidyr::drop_na(deaths_100k)
+
+
+
+
+
+
+stargazer::stargazer(reg_1, reg_2, type = 'text',
+                     title = "Regressões de Mínimos Quadrados Ordninários.",
+                     dep.var.caption = 'Variável Dependente',
+                     omit.table.layout = c('n'),
+                     omit.stat=c("LL","ser","f")
+                     )
 
 
 
