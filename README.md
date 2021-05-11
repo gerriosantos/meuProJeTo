@@ -65,7 +65,9 @@ df_casos <- readr::read_rds('data/dados.rds')
 
 -   O método que será utilizado para ver essa associação entre as
     variáveis será uma regressão simples de mínimos quadrados ordinários
-    (MQO). *y*<sub>*i*</sub> = *α* + *β**x* + *ϵ*
+    (MQO).
+
+*y*<sub>*i*</sub> = *α* + *β**x* + *ϵ*
 
 # Análise Descritiva dos Dados
 
@@ -83,15 +85,13 @@ dados <- readr::read_rds('data/dados.rds') %>%
   )) %>%  dplyr::relocate(reeleicao:d_reeleicao, porte_cidade, .before = pop19)
 ```
 
--   Dados geográficos (`geobr`) com as coordenadas dos limtes dos
-    municípios do estado do Ceará para juntar a base de `dados` com as
-    variáveis principais:
+-   Dados com coordenadas geográficas (retiradas do pacote do `geobr` do
+    [Ipea](https://github.com/ipeaGIT/geobr)) dos municípios do estado
+    do Ceará, as quais foram juntadas a base de dados com as variávies
+    principais:
 
 ``` r
-mun <- geobr::read_municipality(code_muni = 'CE') %>%
-  dplyr::select(code_muni, geom) %>%
-  dplyr::left_join(dados, by = c('code_muni'='codibge'))
-#> Downloading: 1.2 kB     Downloading: 1.2 kB     Downloading: 2 kB     Downloading: 2 kB     Downloading: 10 kB     Downloading: 10 kB     Downloading: 26 kB     Downloading: 26 kB     Downloading: 43 kB     Downloading: 43 kB     Downloading: 59 kB     Downloading: 59 kB     Downloading: 67 kB     Downloading: 67 kB     Downloading: 83 kB     Downloading: 83 kB     Downloading: 99 kB     Downloading: 99 kB     Downloading: 120 kB     Downloading: 120 kB     Downloading: 120 kB     Downloading: 120 kB     Downloading: 120 kB     Downloading: 120 kB     Downloading: 140 kB     Downloading: 140 kB     Downloading: 160 kB     Downloading: 160 kB     Downloading: 170 kB     Downloading: 170 kB     Downloading: 190 kB     Downloading: 190 kB     Downloading: 200 kB     Downloading: 200 kB     Downloading: 220 kB     Downloading: 220 kB     Downloading: 240 kB     Downloading: 240 kB     Downloading: 240 kB     Downloading: 240 kB     Downloading: 240 kB     Downloading: 240 kB     Downloading: 260 kB     Downloading: 260 kB     Downloading: 270 kB     Downloading: 270 kB     Downloading: 280 kB     Downloading: 280 kB     Downloading: 290 kB     Downloading: 290 kB     Downloading: 300 kB     Downloading: 300 kB     Downloading: 320 kB     Downloading: 320 kB     Downloading: 330 kB     Downloading: 330 kB     Downloading: 350 kB     Downloading: 350 kB     Downloading: 360 kB     Downloading: 360 kB     Downloading: 370 kB     Downloading: 370 kB     Downloading: 370 kB     Downloading: 370 kB
+mun <- readr::read_rds('data/dados_geom.rds')
 ```
 
 -   Mapa mostrando os municípios que reelegeram seus prefeitos e os que
@@ -135,15 +135,15 @@ mun %>% ggplot2::ggplot(ggplot2::aes(fill = reeleicao))+
     de casos confirmados. Diante disso, os indícios apontam que, talvez,
     no cenário de caos, os municípios que tiveram proporcionalmente mais
     casos da covid19 e conseguiram melhores desempenhos em relação a
-    mitigar a perdas de vidas podem ter sido reelegido como prêmio da
-    pefromance no período de crise. Por outro lado, quando se trata de
-    cidades de grande porte (nessa amostra, cidades acima de 200 mil
-    habitantes), como Nível 5 por exemplo, em termos médios, os
+    mitigar as perdas de vidas podem ter reelegido seus prefeitos como
+    prêmio da peformance no período de crise. Por outro lado, quando se
+    trata de cidades de grande porte (nessa amostra, cidades acima de
+    200 mil habitantes), como Nível 5 por exemplo, em termos médios, os
     prefeitos foram reeleitos mesmo com maiores valores médios tanto
-    para os casos confirmados quanto das mortes por 100k de hab.
-    Contudo, é preciso ter cautela nessa análise, pois a capital é um
-    *outlier* quando se trata de pandemia, sendo que a média nem sempre
-    repsresenta uma medida confiável.
+    para os casos confirmados por 100k de hab quanto das mortes por 100k
+    de hab. Contudo, é preciso ter cautela nessa análise, pois a capital
+    é um *outlier* quando se trata de pandemia, sendo que a média nem
+    sempre representa uma medida confiável.
 
 ``` r
 `%>%` <- magrittr::`%>%`
@@ -177,5 +177,40 @@ dados %>%
 reeleitos por porte da cidade.
 
 ## Análise Gráfica
+
+-   Analisar os histogramas para ter uma direção em relação a hipótese
+    de normalidade, que deve ser garantida em estimações de mínimos
+    quadrados ordinários. As variáveis usadas serão usadas como
+    dependentes no modelo posteriormente.
+
+-   Fazer uma função simples para gerar os dois plots:
+
+``` r
+graf_hist <- function(base, indicador, titulo, eixo_x){
+
+  base %>%
+    ggplot2::ggplot(ggplot2::aes(x = {{indicador}}))+
+    ggplot2::geom_histogram(bins = 10, fill = 'lightblue', color = 'gray')+
+    ggplot2::theme_minimal()+
+    ggplot2::labs(title = titulo,
+                  x = eixo_x,
+                  y = 'Contagem dos municípios')
+}
+```
+
+-   Agora, a função será usada:
+
+``` r
+d <- graf_hist(base=dados, indicador=confirmed_100k,
+               titulo = 'Distribuição dos casos confirmados',
+               eixo_x = 'Casos confirmados por 100k de hab')
+d1 <- graf_hist(base=dados, indicador = deaths_100k,
+                titulo = 'Distribuição das mortes',
+                eixo_x = 'Mortes por 100k hab')
+
+cowplot::plot_grid(d, d1)
+```
+
+![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ## Conclusões

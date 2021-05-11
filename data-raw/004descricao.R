@@ -19,6 +19,9 @@ mun <- geobr::read_municipality(code_muni = 'CE') %>%
   dplyr::select(code_muni, geom) %>%
   dplyr::left_join(dados, by = c('code_muni'='codibge'))
 
+readr::write_rds(mun, 'data/dados_geom.rds')
+
+
 mun %>% ggplot2::ggplot(ggplot2::aes(fill = reeleicao))+
   ggplot2::geom_sf()+
   ggplot2::labs(title = 'Municípios cearenses.', fill = '')+
@@ -34,15 +37,6 @@ mun %>% ggplot2::ggplot(ggplot2::aes(fill = reeleicao))+
         axis.text=ggplot2::element_blank(),
         axis.ticks=ggplot2::element_blank())+
   ggplot2::guides(ggplot2::guide_legend(title.position = 'none'))
-
-
-
-
-
-
-
-
-
 
 
 
@@ -62,6 +56,28 @@ dados %>%
     format.args = list(big.mark = '.', decimal.mark = ','))
 
 
+# Gráficos
 
 
+graf_hist <- function(base, indicador, titulo, eixo_x){
+
+  base %>%
+    ggplot2::ggplot(ggplot2::aes(x = {{indicador}}))+
+    ggplot2::geom_histogram(bins = 10, fill = 'lightblue', color = 'gray')+
+    ggplot2::theme_minimal()+
+    ggplot2::labs(title = titulo,
+                  x = eixo_x,
+                  y = 'Contagem dos municípios')
+}
+
+d <- graf_hist(base=dados, indicador=confirmed_100k,
+               titulo = 'Distribuição dos casos confirmados por 100k de hab no estado do Ceará',
+               eixo_x = 'Casos confirmados por 100k de hab')
+d
+d1 <- graf_hist(base=dados, indicador = deaths_100k,
+                titulo = 'Distribuição das mortes por 100k de hab no estado do Ceará',
+                eixo_x = 'Mortes por 100k hab')
+d1
+
+cowplot::plot_grid(d, d1)
 

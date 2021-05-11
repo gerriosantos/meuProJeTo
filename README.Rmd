@@ -71,7 +71,9 @@ df_casos <- readr::read_rds('data/dados.rds')
     - **`deaths_100k`**
     
     
- - O método que será utilizado para ver essa associação entre as variáveis será uma regressão simples de mínimos quadrados ordinários (MQO). $y_i = \alpha + \beta x + \epsilon$  
+ - O método que será utilizado para ver essa associação entre as variáveis será uma regressão simples de mínimos quadrados ordinários (MQO). 
+ 
+ $$y_i = \alpha + \beta x + \epsilon$$  
   
   
   
@@ -97,20 +99,19 @@ dados <- readr::read_rds('data/dados.rds') %>%
 ```
 
 
-- Dados geográficos (`geobr`) com as coordenadas dos limtes dos municípios do estado do Ceará para juntar a base de `dados` com as variáveis principais:
+- Dados com coordenadas geográficas (retiradas do pacote do `geobr` do [Ipea](https://github.com/ipeaGIT/geobr)) dos municípios do estado do Ceará, as quais foram juntadas a base de dados com as variávies principais:
 
-```{r, echo=TRUE, warning=FALSE, message=FALSE}
+```{r, echo=TRUE, dpi=300, warning=FALSE, message=FALSE}
 
-mun <- geobr::read_municipality(code_muni = 'CE') %>%
-  dplyr::select(code_muni, geom) %>%
-  dplyr::left_join(dados, by = c('code_muni'='codibge'))
+mun <- readr::read_rds('data/dados_geom.rds')
+
 ```
 
 
 - Mapa mostrando os municípios que reelegeram seus prefeitos e os que não reelegeram. 
   - O Ceará tem 184 municípios, contudo, a amostra contempla somente os prefeitos de 2016 que conseguiram reeleeição ou não. Portanto, há outros 72 municípios que nos quais, por exemplo, os prefeitos já estavam em segundo mandato ou não buscaram a reeleição.
 
-```{r, echo=TRUE, warning=FALSE, message=FALSE}
+```{r echo=TRUE, message=FALSE, warning=FALSE}
 
 
 mun %>% ggplot2::ggplot(ggplot2::aes(fill = reeleicao))+
@@ -133,11 +134,7 @@ mun %>% ggplot2::ggplot(ggplot2::aes(fill = reeleicao))+
 ```
 
 
-
-
-
-
-- A tabela abaixo mostra quais as médias entre prefeitos reeleitos e não reeleitos, com uma estratificação pelo porte do município segundo sua faixa de população. Ao observar os valores médios das variáveis, constata-se um certo padrão no qual os municípios de menores e médio porte (até Nível 3) apresentam maiores médias no número de mortes por 100k de hab quando se trata de não reelição dos prefeitos, enquanto os casos confirmados por 100k de hab parece seguir o padrão reverso quando observado do Nível 2 ao Nivel 4, onde os municípios que reelegeram seus prefeitos possuem maiores médias de casos confirmados. Diante disso, os indícios apontam que, talvez, no cenário de caos, os municípios que tiveram proporcionalmente mais casos da covid19 e conseguiram melhores desempenhos em relação a mitigar a perdas de vidas podem ter sido reelegido como prêmio da pefromance no período de crise. Por outro lado, quando se trata de cidades de grande porte (nessa amostra, cidades acima de 200 mil habitantes), como Nível 5 por exemplo, em termos médios, os prefeitos foram reeleitos mesmo com maiores valores médios tanto para os casos confirmados quanto das mortes por 100k de hab. Contudo, é preciso ter cautela nessa análise, pois a capital é um _outlier_ quando se trata de pandemia, sendo que a média nem sempre repsresenta uma medida confiável.
+- A tabela abaixo mostra quais as médias entre prefeitos reeleitos e não reeleitos, com uma estratificação pelo porte do município segundo sua faixa de população. Ao observar os valores médios das variáveis, constata-se um certo padrão no qual os municípios de menores e médio porte (até Nível 3) apresentam maiores médias no número de mortes por 100k de hab quando se trata de não reelição dos prefeitos, enquanto os casos confirmados por 100k de hab parece seguir o padrão reverso quando observado do Nível 2 ao Nivel 4, onde os municípios que reelegeram seus prefeitos possuem maiores médias de casos confirmados. Diante disso, os indícios apontam que, talvez, no cenário de caos, os municípios que tiveram proporcionalmente mais casos da covid19 e conseguiram melhores desempenhos em relação a mitigar as perdas de vidas podem ter reelegido seus prefeitos como prêmio da peformance no período de crise. Por outro lado, quando se trata de cidades de grande porte (nessa amostra, cidades acima de 200 mil habitantes), como Nível 5 por exemplo, em termos médios, os prefeitos foram reeleitos mesmo com maiores valores médios tanto para os casos confirmados por 100k de hab quanto das mortes por 100k de hab. Contudo, é preciso ter cautela nessa análise, pois a capital é um _outlier_ quando se trata de pandemia, sendo que a média nem sempre representa uma medida confiável.
 
 
 ```{r echo=TRUE}
@@ -157,10 +154,42 @@ dados %>%
 
 ```
 
-
-
-
 ## Análise Gráfica
+
+- Analisar os histogramas para ter uma direção em relação a hipótese de normalidade, que deve ser garantida em estimações de mínimos quadrados ordinários. As variáveis usadas serão usadas como dependentes no modelo posteriormente.
+ 
+- Fazer uma função simples para gerar os dois plots:
+   
+```{r, echo=TRUE}
+
+graf_hist <- function(base, indicador, titulo, eixo_x){
+
+  base %>%
+    ggplot2::ggplot(ggplot2::aes(x = {{indicador}}))+
+    ggplot2::geom_histogram(bins = 10, fill = 'lightblue', color = 'gray')+
+    ggplot2::theme_minimal()+
+    ggplot2::labs(title = titulo,
+                  x = eixo_x,
+                  y = 'Contagem dos municípios')
+}
+
+```
+
+- Agora, a função será usada:
+
+```{r, echo=TRUE}
+d <- graf_hist(base=dados, indicador=confirmed_100k,
+               titulo = 'Distribuição dos casos confirmados',
+               eixo_x = 'Casos confirmados por 100k de hab')
+d1 <- graf_hist(base=dados, indicador = deaths_100k,
+                titulo = 'Distribuição das mortes',
+                eixo_x = 'Mortes por 100k hab')
+
+cowplot::plot_grid(d, d1)
+
+```
+
+
 
 ## Conclusões
 
