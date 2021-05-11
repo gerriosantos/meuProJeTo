@@ -4,13 +4,28 @@ casos de covid19?
 **Gerrio Barbosa**
 10/05/2021
 
+-   [Pacotes Usados](#pacotes-usados)
+-   [Objetivo do Projeto](#objetivo-do-projeto)
 -   [Análise Descritiva dos Dados](#análise-descritiva-dos-dados)
     -   [Análise Gráfica](#análise-gráfica)
-    -   [Conclusões](#conclusões)
+-   [Análise do Modelo de Mínimos Quadrados Ordinários
+    (MQO)](#análise-do-modelo-de-mínimos-quadrados-ordinários-mqo)
+    -   [Regressão Simples](#regressão-simples)
+    -   [Regressão Múltipla](#regressão-múltipla)
+-   [Conclusões](#conclusões)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+
+# Pacotes Usados
+
+``` r
+pacman::p_load('stats', 'tidyverse')
+```
+
 <!-- badges: start -->
 <!-- badges: end -->
+
+# Objetivo do Projeto
 
 O projeto tem o objetivo de mostrar uma associação entre os casos
 confirmados e mortes decorrentes da covid19 e o prefeito não ter sido
@@ -121,7 +136,7 @@ mun %>% ggplot2::ggplot(ggplot2::aes(fill = reeleicao))+
   ggplot2::guides(ggplot2::guide_legend(title.position = 'none'))
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 -   A tabela abaixo mostra quais as médias entre prefeitos reeleitos e
     não reeleitos, com uma estratificação pelo porte do município
@@ -187,7 +202,7 @@ reeleitos por porte da cidade.
 
 ``` r
 graf_hist <- function(base, indicador, titulo, eixo_x){
-
+  `%>%` <- magrittr::`%>%`
   base %>%
     ggplot2::ggplot(ggplot2::aes(x = {{indicador}}))+
     ggplot2::geom_histogram(bins = 10, fill = 'lightblue', color = 'gray')+
@@ -211,6 +226,67 @@ d1 <- graf_hist(base=dados, indicador = deaths_100k,
 cowplot::plot_grid(d, d1)
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
+![](README_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
 
-## Conclusões
+# Análise do Modelo de Mínimos Quadrados Ordinários (MQO)
+
+## Regressão Simples
+
+-   Serão usadas nas regressões as variáveis de casos confirmados e
+    mortes por covid19 como variávies dependentes, enquanto a variável
+    de interesse/explicativa será a reeleição do prefeito no ano
+    de 2020. A hipótese levantada é que a não reeleição pode está
+    associada ao mal desempenho dos prefeitos na condução da pandemia no
+    ano de 2020.
+
+    -   Será aplicado o `log` (logaritmo) nas variávies dependentes.
+
+    -   A variável de reeleição é uma *dummy* (0 - reeleitos e 1 - não
+        reeleitos), então, não será aplicado `log`.
+
+    -   A forma funcional será uma *log-lin*.
+
+    -   A interepretação será: uma aumento percentual na variável de
+        reeleição (na chance de não se reeleger), aumenta ou diminui o
+        percentual dos indicadores (casos de confirmados e mortes por
+        covid19).
+
+``` r
+reg <- lm(data =  dados, log(confirmed_100k) ~ d_reeleicao)
+reg <- lm(data =  dados, log(deaths_100k) ~ d_reeleicao)
+```
+
+## Regressão Múltipla
+
+-   Para utilizar uma regressão múltipla com duas variáveis explicativas
+    será feita uma ligação entre a base incial `dados` e a [base de
+    mobilidade da google](https://www.google.com.br/covid19/mobility/).
+    Contudo, devido os dados faltantes, sobretudo para municípios de
+    pequeno porte, o resultado será uma amostra de 65 municípios
+    cearenses.
+
+    -   Quando comparado a quantidade total de municípios do estado, a
+        nova base terá cerca de 35% dos municípios.
+
+    -   Quando comparado a amostra incial (que nesse caso específico
+        seria a população dos prefeitos de 2016 que concorreram as
+        eleições de 2020), a nova base fica com uma amostra que
+        representa em torno de 58%.
+
+-   O indicador de mobilidade modebilidade usado na análise será o de
+    **tendências de mobilidade de locais de trabalho**.
+
+``` r
+mob <- readr::read_rds('data-raw/mob_google_mun.RDS') %>%
+  dplyr::filter(sigla_uf == 'CE') %>%
+  dplyr::select(cod_municipio7, indice_mob = localTrab) %>%
+  dplyr::left_join(dados, by = c('cod_municipio7'='codibge')) %>%
+  tidyr::drop_na(deaths_100k)
+```
+
+``` r
+reg <- lm(data =  mob, log(confirmed_100k) ~ d_reeleicao + indice_mob)
+reg <- lm(data =  mob, log(deaths_100k) ~ d_reeleicao + indice_mob)
+```
+
+# Conclusões

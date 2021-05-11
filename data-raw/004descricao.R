@@ -70,14 +70,33 @@ graf_hist <- function(base, indicador, titulo, eixo_x){
                   y = 'Contagem dos municípios')
 }
 
-d <- graf_hist(base=dados, indicador=confirmed_100k,
-               titulo = 'Distribuição dos casos confirmados por 100k de hab no estado do Ceará',
+d <- graf_hist(base=dados, indicador= log(confirmed_100k),
+               titulo = 'Distribuição dos casos confirmados por 100k de hab',
                eixo_x = 'Casos confirmados por 100k de hab')
 d
-d1 <- graf_hist(base=dados, indicador = deaths_100k,
-                titulo = 'Distribuição das mortes por 100k de hab no estado do Ceará',
+d1 <- graf_hist(base=dados, indicador = log(deaths_100k),
+                titulo = 'Distribuição Mortes por 100k de hab',
                 eixo_x = 'Mortes por 100k hab')
 d1
 
 cowplot::plot_grid(d, d1)
+
+## Regressão simples
+
+reg <- lm(data = dados, log(deaths_100k) ~ d_reeleicao)
+
+stargazer(reg, type = 'text')
+
+
+
+## Regressão multipla
+
+
+mob <- readr::read_rds('data-raw/mob_google_mun.RDS') %>%
+  dplyr::filter(sigla_uf == 'CE') %>%
+  dplyr::select(cod_municipio7, indice_mob = localTrab) %>%
+  dplyr::left_join(dados, by = c('cod_municipio7'='codibge')) %>%
+  tidyr::drop_na(indice_mob)
+
+
 

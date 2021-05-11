@@ -15,17 +15,29 @@ output:
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-```{r, include = FALSE}
+```{r, include = FALSE, warning=FALSE, message=FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+
+`%>%` <- magrittr::`%>%`
+pacman::p_load('stats', 'tidyverse')
+
+```
+
+# Pacotes Usados
+
+```{r,  warning=FALSE, message=FALSE}
+pacman::p_load('stats', 'tidyverse')
 ```
 
 
 
 <!-- badges: start -->
 <!-- badges: end -->
+
+# Objetivo do Projeto
 
 O projeto tem o objetivo de mostrar uma associação entre os casos confirmados e mortes decorrentes da covid19 e o prefeito não ter sido reeleito em 2020, ou seja, aqueles que estavam buscando um segundo mandato. A hipótese noerteadora é que os municípios com prefeitos não reeleitos foram aqueles com maior associação a quantidade de casos e mortes notificadas durante a pandemia. 
 
@@ -163,7 +175,7 @@ dados %>%
 ```{r, echo=TRUE}
 
 graf_hist <- function(base, indicador, titulo, eixo_x){
-
+  `%>%` <- magrittr::`%>%`
   base %>%
     ggplot2::ggplot(ggplot2::aes(x = {{indicador}}))+
     ggplot2::geom_histogram(bins = 10, fill = 'lightblue', color = 'gray')+
@@ -190,8 +202,59 @@ cowplot::plot_grid(d, d1)
 ```
 
 
+# Análise do Modelo de Mínimos Quadrados Ordinários (MQO)
 
-## Conclusões
+## Regressão Simples
+
+- Serão usadas nas regressões as variáveis de casos confirmados e mortes por covid19 como variávies dependentes, enquanto a variável de interesse/explicativa será a reeleição do prefeito no ano de 2020. A hipótese levantada é que a não reeleição pode está associada ao mal desempenho dos prefeitos na condução da pandemia no ano de 2020.
+
+    - Será aplicado o `log` (logaritmo) nas variávies dependentes.
+    - A variável de reeleição é uma _dummy_ (0 - reeleitos e 1 - não reeleitos), então, não será aplicado `log`.
+    - A forma funcional será uma _log-lin_.
+    
+    - A interepretação será: uma aumento percentual na variável de reeleição (na chance de não se reeleger), aumenta ou diminui o percentual dos indicadores (casos de confirmados e mortes por covid19).
+ 
+
+```{r, echo=TRUE}
+
+reg <- lm(data =  dados, log(confirmed_100k) ~ d_reeleicao)
+reg <- lm(data =  dados, log(deaths_100k) ~ d_reeleicao)
+
+```
+
+## Regressão Múltipla
+
+- Para utilizar uma regressão múltipla com duas variáveis explicativas será feita uma ligação entre a base incial `dados` e a [base de mobilidade da google](https://www.google.com.br/covid19/mobility/). Contudo, devido os dados faltantes, sobretudo para municípios de pequeno porte, o resultado será uma amostra de 65 municípios cearenses. 
+
+    - Quando comparado a quantidade total de municípios do estado, a nova base terá cerca de 35\% dos municípios.
+    
+    - Quando comparado a amostra incial (que nesse caso específico seria a população dos prefeitos de 2016 que concorreram as eleições de 2020), a nova base fica com uma amostra que representa em torno de 58\%. 
+
+- O indicador de mobilidade modebilidade usado na análise será o de **tendências de mobilidade de locais de trabalho**.
+
+
+```{r, echo=TRUE}
+
+mob <- readr::read_rds('data-raw/mob_google_mun.RDS') %>%
+  dplyr::filter(sigla_uf == 'CE') %>%
+  dplyr::select(cod_municipio7, indice_mob = localTrab) %>%
+  dplyr::left_join(dados, by = c('cod_municipio7'='codibge')) %>%
+  tidyr::drop_na(deaths_100k)
+
+
+```
+
+
+```{r, echo=TRUE}
+
+reg <- lm(data =  mob, log(confirmed_100k) ~ d_reeleicao + indice_mob)
+reg <- lm(data =  mob, log(deaths_100k) ~ d_reeleicao + indice_mob)
+
+```
+
+
+
+# Conclusões
 
 
 
