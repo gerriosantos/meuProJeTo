@@ -2,7 +2,7 @@ Municípios Cearenses que não reelegeram seus prefeitos tiveram mais
 casos de covid19?
 ================
 **Gerrio Barbosa**
-11/05/2021
+18/05/2021
 
 -   [Pacotes Usados](#pacotes-usados)
 -   [Objetivo do Projeto](#objetivo-do-projeto)
@@ -346,7 +346,7 @@ stargazer::stargazer(reg_1, reg_2, reg_m_1, reg_m_2, type = 'text',
 
 O esboço buscou responder se os prefeitos cearenses não foram reeleitos
 devido a má gestão da crise pandemica da covid19. Para isso, usou-se a
-metodologia de MQO. Contudo, os resultados apontaram que há relação
+metodologia de MQO. Contudo, os resultados apontaram que não há relação
 entre o prefeito não ser reeleito com o mal desempenho na gerência da
 pandemia.
 
@@ -354,5 +354,5 @@ pandemia.
     tem diversas limitações.
 
 -   Outro ponto a ser ressaltado é que esse esboço é somente para uma
-    unidade da federação, sendo possível que os resultados pra outras
+    unidade da federação, sendo possível que os resultados para outras
     unidades possam ser diferentes.
