@@ -18,6 +18,21 @@ readr::write_rds(dados, 'data/dados.rds')
 
 
 
+# `%>%` <- magrittr::`%>%`
+# mob <- readr::read_rds('data-raw/mob_google_mun.RDS') %>%
+#   dplyr::filter(sigla_uf == 'CE') %>%
+#   dplyr::select(cod_municipio7, indice_mob = localTrab) %>%
+#   dplyr::left_join(dados, by = c('cod_municipio7'='codibge')) %>%
+#   tidyr::drop_na(deaths_100k)
+#
+# reg_m_2 <- lm(data =  mob, log(deaths_100k) ~ d_reeleicao + indice_mob)
+#
+# summary(reg_m_2)
+#
+#
+# reg_m_2 <- fixest::feols(data =  mob, log(deaths_100k) ~ d_reeleicao + indice_mob)
+#
+# fixest::etable(reg_m_2, cluster = 'cod_municipio7' ,  se = 'cluster')
 
 
 

@@ -2,7 +2,7 @@ Municípios Cearenses que não reelegeram seus prefeitos tiveram mais
 casos de covid19?
 ================
 **Gerrio Barbosa**
-18/05/2021
+25/02/2022
 
 -   [Pacotes Usados](#pacotes-usados)
 -   [Objetivo do Projeto](#objetivo-do-projeto)
@@ -84,7 +84,7 @@ df_casos <- readr::read_rds('data/dados.rds')
     variáveis será uma regressão simples de mínimos quadrados ordinários
     (MQO).
 
-*y*<sub>*i*</sub> = *α* + *β**x* + *ϵ*
+*y*<sub>*i*</sub> = *α* + *β**x*<sub>*i*</sub> + *ϵ*<sub>*i*</sub>
 
 # Análise Descritiva dos Dados
 

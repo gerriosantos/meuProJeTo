@@ -85,7 +85,7 @@ df_casos <- readr::read_rds('data/dados.rds')
     
  - O método que será utilizado para ver essa associação entre as variáveis será uma regressão simples de mínimos quadrados ordinários (MQO). 
  
- $$y_i = \alpha + \beta x + \epsilon$$  
+ $$y_i = \alpha + \beta x_i + \epsilon_i$$  
   
   
   
